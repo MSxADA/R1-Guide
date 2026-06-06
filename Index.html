@@ -1,0 +1,557 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiBy R1 Interactive Guide</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for compiling JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- SVGs for Icons ---
+        const Icon = ({ children, size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+
+        const Music = (p) => <Icon {...p}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></Icon>;
+        const Smartphone = (p) => <Icon {...p}><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></Icon>;
+        const HardDrive = (p) => <Icon {...p}><line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></Icon>;
+        const Wifi = (p) => <Icon {...p}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></Icon>;
+        const Settings = (p) => <Icon {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></Icon>;
+        const Lightbulb = (p) => <Icon {...p}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></Icon>;
+        const Power = (p) => <Icon {...p}><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></Icon>;
+        const Volume2 = (p) => <Icon {...p}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></Icon>;
+        const SkipForward = (p) => <Icon {...p}><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></Icon>;
+        const Play = (p) => <Icon {...p}><polygon points="5 3 19 12 5 21 5 3"/></Icon>;
+        const Headphones = (p) => <Icon {...p}><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></Icon>;
+        const Battery = (p) => <Icon {...p}><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="13" x2="23" y2="11"/></Icon>;
+        const AlertCircle = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></Icon>;
+        const CheckCircle = (p) => <Icon {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
+        const Menu = (p) => <Icon {...p}><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></Icon>;
+        const X = (p) => <Icon {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></Icon>;
+        const Sliders = (p) => <Icon {...p}><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></Icon>;
+
+        // --- Components ---
+        const WelcomeTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-8 text-white shadow-lg">
+                <h2 className="text-3xl font-bold mb-4">Welcome Back to Pure Music! 🎵</h2>
+                <p className="text-lg opacity-90 leading-relaxed">
+                    Congratulations on your HiBy R1! In a world where our phones are constantly buzzing with emails, texts, and social media, the HiBy R1 is a breath of fresh air. It does one thing, and it does it beautifully: <strong>It plays music.</strong>
+                </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="bg-orange-100 w-12 h-12 flex items-center justify-center rounded-full mb-4 text-orange-600">
+                    <Headphones size={24} />
+                    </div>
+                    <h3 className="font-bold text-xl mb-2">Why It Sounds Better</h3>
+                    <p className="text-slate-600">
+                    Inside this tiny player is a special "audio engine" (called a DAC). Standard smartphones use cheap audio chips, but the R1 uses a premium one designed to make your music sound crystal clear, warm, and detailed. 
+                    </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="bg-orange-100 w-12 h-12 flex items-center justify-center rounded-full mb-4 text-orange-600">
+                    <Smartphone size={24} />
+                    </div>
+                    <h3 className="font-bold text-xl mb-2">Pocket-Sized Power</h3>
+                    <p className="text-slate-600">
+                    Weighing only 70 grams (about the weight of a lemon!), you'll barely feel it in your pocket. Plus, the battery gives you about 15 hours of continuous listening.
+                    </p>
+                </div>
+                </div>
+            </div>
+        );
+
+        const HardwareTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div>
+                <h2 className="text-2xl font-bold mb-2 text-slate-800">Buttons & Connections</h2>
+                <p className="text-slate-600 mb-6">Let's take a quick tour of the outside of your player.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 className="font-bold text-lg mb-4 flex items-center text-slate-800">
+                    <Smartphone className="mr-2 text-orange-500" /> The Right Side
+                    </h3>
+                    <ul className="space-y-4">
+                    <li className="flex items-start">
+                        <Power className="mr-3 text-slate-400 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">Power Button</p>
+                        <p className="text-sm text-slate-600">Press and hold to turn the device completely on or off. A quick click wakes up the screen or puts it to sleep.</p>
+                        </div>
+                    </li>
+                    <li className="flex items-start">
+                        <Volume2 className="mr-3 text-slate-400 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">Volume Up & Down</p>
+                        <p className="text-sm text-slate-600">Physical buttons so you can change the volume without looking at the screen.</p>
+                        </div>
+                    </li>
+                    <li className="flex items-start">
+                        <Play className="mr-3 text-slate-400 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">Play / Pause</p>
+                        <p className="text-sm text-slate-600">Quickly stop or start your music.</p>
+                        </div>
+                    </li>
+                    <li className="flex items-start">
+                        <SkipForward className="mr-3 text-slate-400 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">Next Track</p>
+                        <p className="text-sm text-slate-600">Skip to the next song.</p>
+                        </div>
+                    </li>
+                    </ul>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 className="font-bold text-lg mb-4 flex items-center text-slate-800">
+                    <HardDrive className="mr-2 text-orange-500" /> The Bottom
+                    </h3>
+                    <ul className="space-y-4">
+                    <li className="flex items-start">
+                        <Headphones className="mr-3 text-slate-400 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">Headphone Jack (3.5mm)</p>
+                        <p className="text-sm text-slate-600">Plug in your favorite wired headphones here for the best possible sound quality.</p>
+                        </div>
+                    </li>
+                    <li className="flex items-start">
+                        <Battery className="mr-3 text-slate-400 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">USB-C Port</p>
+                        <p className="text-sm text-slate-600">Use this to charge your player with the included cable.</p>
+                        </div>
+                    </li>
+                    <li className="flex items-start">
+                        <HardDrive className="mr-3 text-red-500 mt-1" size={20} />
+                        <div>
+                        <p className="font-semibold text-slate-800">MicroSD Card Slot <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded ml-2">Crucial!</span></p>
+                        <p className="text-sm text-slate-600"><strong>The player has NO internal storage.</strong> You must buy a MicroSD memory card and slide it in here to hold your music.</p>
+                        </div>
+                    </li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+        );
+
+        const LocalMusicTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div>
+                <h2 className="text-2xl font-bold mb-2 text-slate-800">Your Personal Library (MicroSD)</h2>
+                <p className="text-slate-600 mb-6">Here is exactly how to get your own music files onto the player.</p>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg flex">
+                <AlertCircle className="text-blue-500 mr-3 flex-shrink-0" />
+                <p className="text-blue-800 text-sm">
+                    <strong>What you need:</strong> A MicroSD card (SanDisk or Samsung are great brands). We recommend 128GB or 256GB. You'll also need an "SD Card Reader" to plug the card into your computer.
+                </p>
+                </div>
+
+                <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+                {[
+                    { step: 1, title: "Plug into Computer", desc: "Take your MicroSD card and put it into your card reader. Plug the reader into your computer (PC or Mac)." },
+                    { step: 2, title: "Drag and Drop", desc: "Open the memory card folder on your computer. Create a folder called 'Music'. Drag and drop your favorite albums and songs directly into this folder. Keep it organized: Music > Artist > Album." },
+                    { step: 3, title: "Insert into Player", desc: "Safely eject the card from your computer, take it out, and push it into the slot on the bottom of your HiBy R1 until it clicks into place." },
+                    { step: 4, title: "Scan for Music", desc: "Turn on the R1. Go to the main menu and look for 'Update Database' or 'Scan Music'. Tap it. The player will read the card and organize all your songs, artists, and albums nicely!" }
+                ].map((item) => (
+                    <div key={item.step} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-orange-500 text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+                        {item.step}
+                    </div>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 className="font-bold text-slate-800 mb-1">{item.title}</h4>
+                        <p className="text-sm text-slate-600">{item.desc}</p>
+                    </div>
+                    </div>
+                ))}
+                </div>
+            </div>
+        );
+
+        const StreamingTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div>
+                <h2 className="text-2xl font-bold mb-2 text-slate-800">Streaming Apps (Tidal / Qobuz)</h2>
+                <p className="text-slate-600 mb-6">If you pay for a service like Tidal, you can stream millions of songs directly on your R1 via Wi-Fi.</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+                <h3 className="font-bold text-lg mb-4 flex items-center text-slate-800">
+                    <Wifi className="mr-2 text-orange-500" /> Step-by-Step Login
+                </h3>
+                <p className="text-slate-600 text-sm mb-4">Because the R1 doesn't have a large keyboard to type a long password, logging in is actually incredibly clever and simple:</p>
+                
+                <ol className="list-decimal list-inside space-y-3 text-slate-700 ml-2">
+                    <li><strong>Connect to Wi-Fi:</strong> Swipe down from the top edge of the screen to open quick settings, tap the Wi-Fi icon, and connect to your home network.</li>
+                    <li><strong>Open the App:</strong> On the home screen, tap the <strong>"Stream Media"</strong> icon, then tap <strong>Tidal</strong>.</li>
+                    <li><strong>The Magic Code:</strong> The screen will display a QR code (a black and white square box).</li>
+                    <li><strong>Use Your Phone:</strong> Take out your smartphone, open your Camera app, and point it at the QR code. Tap the link that pops up.</li>
+                    <li><strong>Approve:</strong> Your phone will ask you to approve the login. Once you click yes on your phone, your HiBy R1 will instantly log in and show your music!</li>
+                </ol>
+                </div>
+
+                <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg flex">
+                <AlertCircle className="text-amber-500 mr-3 flex-shrink-0 mt-1" />
+                <div>
+                    <p className="text-amber-800 font-bold text-sm">Important Streaming Note</p>
+                    <p className="text-amber-700 text-sm mt-1">
+                    The HiBy R1 is built for <strong>Live Streaming</strong> over Wi-Fi. You cannot "download" Tidal songs to the device for offline listening like you can on a phone. To listen away from home without Wi-Fi, you will need to use a MicroSD card with your own music files.
+                    </p>
+                </div>
+                </div>
+            </div>
+        );
+
+        const SettingsTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div>
+                <h2 className="text-2xl font-bold mb-2 text-slate-800">Simple Sound Customization</h2>
+                <p className="text-slate-600 mb-6">You don't need an audio engineering degree to make your music sound perfect.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 className="font-bold text-lg mb-2 text-slate-800 flex items-center">
+                    <Settings className="mr-2 text-orange-500" size={20} /> The Magic Settings Menu
+                    </h3>
+                    <p className="text-slate-600 text-sm mb-4">
+                    <strong>Swipe down from the top of the screen</strong> to open the quick menu. Here you'll find easy buttons for Wi-Fi, Bluetooth, Screen Brightness, and Sound features.
+                    </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 className="font-bold text-lg mb-2 text-slate-800 flex items-center">
+                    <Volume2 className="mr-2 text-orange-500" size={20} /> Gain (Volume Boost)
+                    </h3>
+                    <p className="text-slate-600 text-sm mb-4">
+                    In the quick menu, you'll see a button for <strong>Gain</strong> (High or Low).
+                    <br/><br/>
+                    • Use <strong>Low Gain</strong> for standard, sensitive earbuds.<br/>
+                    • Use <strong>High Gain</strong> if you plug in large, heavy over-ear headphones that need extra power to get loud.
+                    </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm md:col-span-2">
+                    <h3 className="font-bold text-lg mb-2 text-slate-800 flex items-center">
+                    <Music className="mr-2 text-orange-500" size={20} /> MSEB (Mage Sound 8-Ball)
+                    </h3>
+                    <p className="text-slate-600 text-sm mb-4">
+                    This is HiBy's secret weapon. Instead of complicated graphs with confusing numbers, the MSEB menu asks you how you want your music to feel in plain English. Just use the sliders to adjust!
+                    </p>
+                    <ul className="space-y-3 mt-4 text-sm bg-slate-50 p-4 rounded-lg">
+                    <li className="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <span className="font-semibold">Overall Temperature</span>
+                        <span className="text-slate-500 italic">Cool (Crisp) vs. Warm (Cozy)</span>
+                    </li>
+                    <li className="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <span className="font-semibold">Bass Extension</span>
+                        <span className="text-slate-500 italic">Light vs. Deep Thump</span>
+                    </li>
+                    <li className="flex justify-between items-center">
+                        <span className="font-semibold">Vocals</span>
+                        <span className="text-slate-500 italic">Pushed Back vs. Up Close & Personal</span>
+                    </li>
+                    </ul>
+                    <p className="text-xs text-slate-500 mt-3 text-center">Don't be afraid to experiment! You can always hit "Reset" if you mess up.</p>
+                </div>
+                </div>
+            </div>
+        );
+
+        const EqTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div>
+                    <h2 className="text-2xl font-bold mb-2 text-slate-800">Advanced EQ (PEQ) Guide</h2>
+                    <p className="text-slate-600 mb-6">Take total control of your music. Don't let the numbers scare you—we'll explain it simply!</p>
+                </div>
+
+                <div className="bg-indigo-50 border-l-4 border-indigo-500 p-5 rounded-r-lg mb-6 shadow-sm">
+                    <h3 className="font-bold text-indigo-900 mb-2 flex items-center text-lg">
+                        <Sliders className="mr-2" size={20} /> What is PEQ? (The Piano Analogy)
+                    </h3>
+                    <p className="text-indigo-800 text-sm mb-3">
+                        Regular EQ is like adjusting the "Bass" or "Treble" knobs on a car stereo. It's a blunt instrument. <strong>PEQ (Parametric EQ)</strong> is like having access to every single key on a giant piano, allowing you to fine-tune perfectly.
+                    </p>
+                    <ul className="space-y-2 text-sm text-indigo-800 bg-white bg-opacity-60 p-4 rounded-lg">
+                        <li>🎹 <strong>Freq (Frequency / Hz):</strong> Which specific piano key you are selecting. Low numbers (like 60Hz) are deep bass. High numbers (like 8000Hz) are cymbals.</li>
+                        <li>🔊 <strong>Gain (dB):</strong> Are you pressing that key harder (louder/positive number) or softer (quieter/negative number)?</li>
+                        <li>🎯 <strong>Q-Value (Width):</strong> When you press that key, how many of the <em>neighboring</em> keys are you pressing with it? A low Q (0.5) is a wide, fat finger hitting many keys. A high Q (2.0) is a tiny, precise finger hitting just that one key.</li>
+                    </ul>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+                    <h3 className="font-bold text-xl text-slate-800 mb-2 border-b pb-2">🎷 Jazz Profile: Crinacle Zero RED</h3>
+                    <p className="text-slate-600 text-sm mb-4">
+                        The Truthear x Crinacle Zero: RED are fantastic dual-driver earphones! They are already incredibly accurate. For Jazz, we just want to add a tiny bit of "body" to upright acoustic basses and saxophones, and add a little bit of "air" for the cymbal brushes.
+                    </p>
+                    <p className="text-xs font-bold text-orange-600 mb-2">HOW TO ENTER THIS: Go to Settings &gt; Equalizer &gt; Turn on PEQ &gt; Tap a "Band" number to enter these values.</p>
+                    
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs text-slate-700 bg-slate-100 uppercase">
+                                <tr>
+                                    <th className="px-4 py-3 rounded-tl-lg">Band #</th>
+                                    <th className="px-4 py-3">Type</th>
+                                    <th className="px-4 py-3">Freq (Hz)</th>
+                                    <th className="px-4 py-3">Gain (dB)</th>
+                                    <th className="px-4 py-3 rounded-tr-lg">Q-Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="border-b">
+                                    <td className="px-4 py-3 font-bold">Band 1</td>
+                                    <td className="px-4 py-3">Low Shelf</td>
+                                    <td className="px-4 py-3 font-mono">100</td>
+                                    <td className="px-4 py-3 font-mono text-green-600">+1.5</td>
+                                    <td className="px-4 py-3 font-mono">0.7</td>
+                                </tr>
+                                <tr className="border-b bg-slate-50">
+                                    <td className="px-4 py-3 font-bold">Band 2</td>
+                                    <td className="px-4 py-3">Peak / Bell</td>
+                                    <td className="px-4 py-3 font-mono">250</td>
+                                    <td className="px-4 py-3 font-mono text-green-600">+1.0</td>
+                                    <td className="px-4 py-3 font-mono">1.0</td>
+                                </tr>
+                                <tr className="border-b">
+                                    <td className="px-4 py-3 font-bold">Band 3</td>
+                                    <td className="px-4 py-3">Peak / Bell</td>
+                                    <td className="px-4 py-3 font-mono">3000</td>
+                                    <td className="px-4 py-3 font-mono text-red-500">-1.0</td>
+                                    <td className="px-4 py-3 font-mono">2.0</td>
+                                </tr>
+                                <tr>
+                                    <td className="px-4 py-3 font-bold">Band 4</td>
+                                    <td className="px-4 py-3">Peak / Bell</td>
+                                    <td className="px-4 py-3 font-mono">8000</td>
+                                    <td className="px-4 py-3 font-mono text-green-600">+1.5</td>
+                                    <td className="px-4 py-3 font-mono">1.5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-3 italic">*Leave the other bands alone (Gain at 0). This profile warms up the bass slightly and gives horns a smooth, fatigue-free presence.*</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 className="font-bold text-slate-800 mb-2">🥁 Basic Bass Boost</h4>
+                        <p className="text-xs text-slate-600 mb-3">Want more thump for Hip-Hop or Rock? Add this to Band 1.</p>
+                        <ul className="text-sm font-mono bg-slate-50 p-3 rounded border">
+                            <li>Type: Low Shelf</li>
+                            <li>Freq: 60 Hz</li>
+                            <li>Gain: +3.0 dB</li>
+                            <li>Q: 0.7</li>
+                        </ul>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 className="font-bold text-slate-800 mb-2">🎤 Clearer Vocals</h4>
+                        <p className="text-xs text-slate-600 mb-3">Having trouble hearing the singer over the instruments? Add this to Band 2.</p>
+                        <ul className="text-sm font-mono bg-slate-50 p-3 rounded border">
+                            <li>Type: Peak / Bell</li>
+                            <li>Freq: 1500 Hz</li>
+                            <li>Gain: +2.0 dB</li>
+                            <li>Q: 1.0</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const TipsTab = () => (
+            <div className="space-y-6 animate-fade-in">
+                <div>
+                <h2 className="text-2xl font-bold mb-2 text-slate-800">Pro Tips & Tricks</h2>
+                <p className="text-slate-600 mb-6">Little secrets to get the most out of your player.</p>
+                </div>
+
+                <div className="space-y-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-start">
+                    <CheckCircle className="text-green-500 mr-4 mt-1 flex-shrink-0" />
+                    <div>
+                    <h4 className="font-bold text-slate-800">Wired is Best</h4>
+                    <p className="text-sm text-slate-600">While the player <em>does</em> have Bluetooth, to truly hear the incredible "Hi-Fi" sound chip inside, plug in a nice pair of wired headphones. It sounds significantly better than wireless.</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-start">
+                    <CheckCircle className="text-green-500 mr-4 mt-1 flex-shrink-0" />
+                    <div>
+                    <h4 className="font-bold text-slate-800">Save Your Battery</h4>
+                    <p className="text-sm text-slate-600">Always <strong>pause</strong> your music before turning the screen off for a long time. If you leave it playing silently, it will drain the battery overnight!</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-start">
+                    <CheckCircle className="text-green-500 mr-4 mt-1 flex-shrink-0" />
+                    <div>
+                    <h4 className="font-bold text-slate-800">The "Now Playing" Shortcut</h4>
+                    <p className="text-sm text-slate-600">Lost in the menus? Simply <strong>swipe left</strong> from the right edge of the main screen to instantly jump back to the song that is currently playing.</p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-start">
+                    <CheckCircle className="text-green-500 mr-4 mt-1 flex-shrink-0" />
+                    <div>
+                    <h4 className="font-bold text-slate-800">How to Fix a Freeze</h4>
+                    <p className="text-sm text-slate-600">Computers glitch sometimes. If the player ever freezes and won't respond to touches, simply press and hold the physical Power button for <strong>10 to 15 seconds</strong>. This forces it to restart safely.</p>
+                    </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-start">
+                    <CheckCircle className="text-green-500 mr-4 mt-1 flex-shrink-0" />
+                    <div>
+                    <h4 className="font-bold text-slate-800">Bedtime Listening</h4>
+                    <p className="text-sm text-slate-600">If you like falling asleep to music, go to the quick menu (swipe down from top) and turn on <strong>Sleep Shutdown</strong>. You can set a timer so the player automatically turns itself off after you fall asleep.</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+        );
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('welcome');
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+            const tabs = [
+                { id: 'welcome', label: 'Welcome & Features', icon: <Music size={20} /> },
+                { id: 'hardware', label: 'Buttons & Ports', icon: <Smartphone size={20} /> },
+                { id: 'local', label: 'Local Music (SD Card)', icon: <HardDrive size={20} /> },
+                { id: 'streaming', label: 'Tidal & Wi-Fi', icon: <Wifi size={20} /> },
+                { id: 'settings', label: 'Sound Settings', icon: <Settings size={20} /> },
+                { id: 'eq', label: 'Advanced EQ (PEQ)', icon: <Sliders size={20} /> },
+                { id: 'tips', label: 'Pro Tips', icon: <Lightbulb size={20} /> },
+            ];
+
+            const handleTabChange = (id) => {
+                setActiveTab(id);
+                setMobileMenuOpen(false);
+            };
+
+            const renderContent = () => {
+                switch (activeTab) {
+                case 'welcome': return <WelcomeTab />;
+                case 'hardware': return <HardwareTab />;
+                case 'local': return <LocalMusicTab />;
+                case 'streaming': return <StreamingTab />;
+                case 'settings': return <SettingsTab />;
+                case 'eq': return <EqTab />;
+                case 'tips': return <TipsTab />;
+                default: return <WelcomeTab />;
+                }
+            };
+
+            return (
+                <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+                
+                {/* Sidebar - Desktop */}
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-slate-300 flex-shrink-0 shadow-2xl z-10">
+                    <div className="p-6 pb-2">
+                    <h1 className="text-2xl font-bold text-white tracking-tight">HiBy R1 Guide</h1>
+                    <p className="text-sm text-slate-500 mt-1">Interactive User Manual</p>
+                    </div>
+                    
+                    <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                    {tabs.map((tab) => (
+                        <button
+                        key={tab.id}
+                        onClick={() => handleTabChange(tab.id)}
+                        className={`w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-left ${
+                            activeTab === tab.id 
+                            ? 'bg-orange-500 text-white shadow-md' 
+                            : 'hover:bg-slate-800 hover:text-white'
+                        }`}
+                        >
+                        <span className="mr-3">{tab.icon}</span>
+                        <span className="font-medium">{tab.label}</span>
+                        </button>
+                    ))}
+                    </nav>
+                </aside>
+
+                {/* Mobile Header & Menu */}
+                <div className="md:hidden fixed top-0 left-0 right-0 bg-slate-900 text-white z-20 flex items-center justify-between p-4 shadow-md">
+                    <h1 className="text-xl font-bold">HiBy R1 Guide</h1>
+                    <button 
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="p-2 bg-slate-800 rounded-lg text-slate-200"
+                    >
+                    {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+
+                {/* Mobile Drawer */}
+                {mobileMenuOpen && (
+                    <div className="md:hidden fixed inset-0 top-[68px] bg-slate-900 text-slate-300 z-20 overflow-y-auto flex flex-col p-4 shadow-inner">
+                    <nav className="space-y-2">
+                        {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => handleTabChange(tab.id)}
+                            className={`w-full flex items-center px-4 py-4 rounded-xl transition-all duration-200 text-left ${
+                            activeTab === tab.id 
+                                ? 'bg-orange-500 text-white shadow-md' 
+                                : 'bg-slate-800 text-white'
+                            }`}
+                        >
+                            <span className="mr-3">{tab.icon}</span>
+                            <span className="font-medium text-lg">{tab.label}</span>
+                        </button>
+                        ))}
+                    </nav>
+                    </div>
+                )}
+
+                {/* Main Content Area */}
+                <main className="flex-1 overflow-y-auto relative bg-slate-50 pt-20 md:pt-0">
+                    <div className="max-w-3xl mx-auto p-4 md:p-8 lg:p-12 pb-24">
+                    {renderContent()}
+                    </div>
+                </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
+
+```
