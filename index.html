@@ -214,37 +214,234 @@
             </div>
         );
 
-        const LocalMusicTab = () => (
-            <div className="space-y-8 animate-fade-in font-serif max-w-2xl mx-auto">
-                <ChapterTitle title="Curating Your Archive" subtitle="Chapter III: Local Memory (MicroSD)" />
+        const EqTab = () => {
+            const profiles = {
+                jazz: {
+                    title: "Jazz",
+                    subtitle: "Warmth & Air",
+                    desc: "Breathes a touch of wooden resonance into the upright bass and draws out the delicate breath of the saxophone. Perfect for preserving the natural tone of earphones like the Crinacle Zero RED.",
+                    preamp: "-2.0",
+                    bands: [
+                        { id: 1, type: "Low Shelf", freq: "100", gain: "+1.5", q: "0.7" },
+                        { id: 2, type: "Peak / Bell", freq: "250", gain: "+1.0", q: "1.0" },
+                        { id: 3, type: "Peak / Bell", freq: "3000", gain: "-1.0", q: "2.0" },
+                        { id: 4, type: "Peak / Bell", freq: "8000", gain: "+1.5", q: "1.5" },
+                    ]
+                },
+                metal: {
+                    title: "Heavy Metal",
+                    subtitle: "Speed & Bite",
+                    desc: "Adds a fast, visceral punch to the kick drums while scooping out the 'muddy' low-mids. The high-frequency boost adds aggression and 'bite' to heavily distorted guitars.",
+                    preamp: "-3.0",
+                    bands: [
+                        { id: 1, type: "Low Shelf", freq: "80", gain: "+3.0", q: "0.7" },
+                        { id: 2, type: "Peak / Bell", freq: "300", gain: "-2.0", q: "1.0" },
+                        { id: 3, type: "Peak / Bell", freq: "4000", gain: "+2.0", q: "1.5" },
+                    ]
+                },
+                classic_rock: {
+                    title: "Classic Rock",
+                    subtitle: "Vocal & Guitar Clarity",
+                    desc: "Tames the modern sub-bass rumble to maintain a vintage feel, while subtly pushing the mid-range forward to highlight lead vocals and classic guitar solos.",
+                    preamp: "-2.0",
+                    bands: [
+                        { id: 1, type: "Low Shelf", freq: "60", gain: "-1.0", q: "0.7" },
+                        { id: 2, type: "Peak / Bell", freq: "1000", gain: "+1.5", q: "1.0" },
+                        { id: 3, type: "High Shelf", freq: "10000", gain: "+1.5", q: "0.7" },
+                    ]
+                },
+                punk: {
+                    title: "Punk",
+                    subtitle: "Raw & Aggressive",
+                    desc: "Pushes the raw mid-range frequencies forward. It highlights the driving grunt of the bass guitar and the sharp, chaotic crack of the snare drum and shouting vocals.",
+                    preamp: "-2.0",
+                    bands: [
+                        { id: 1, type: "Peak / Bell", freq: "150", gain: "+1.5", q: "1.0" },
+                        { id: 2, type: "Peak / Bell", freq: "2500", gain: "+2.0", q: "1.5" },
+                    ]
+                },
+                electronic: {
+                    title: "Electronic",
+                    subtitle: "Massive Sub & Crisp Highs",
+                    desc: "A classic 'V-shape' profile. It introduces a massive, deep sub-bass rumble that you can feel in your chest, cleans up the middle so it doesn't sound boxy, and adds a crisp shimmer to the synths.",
+                    preamp: "-4.0",
+                    bands: [
+                        { id: 1, type: "Low Shelf", freq: "40", gain: "+4.0", q: "0.7" },
+                        { id: 2, type: "Peak / Bell", freq: "200", gain: "-1.5", q: "1.0" },
+                        { id: 3, type: "High Shelf", freq: "8000", gain: "+2.5", q: "0.7" },
+                    ]
+                },
+                stoner_rock: {
+                    title: "Stoner / Doom Rock",
+                    subtitle: "Thick Fuzz & Atmosphere",
+                    desc: "Builds a dark, thick atmosphere. It boosts the heavy rhythm section and thickens the fuzzy body of the guitars, while rolling off harsh modern treble to keep the mood vintage and smoky.",
+                    preamp: "-3.0",
+                    bands: [
+                        { id: 1, type: "Low Shelf", freq: "80", gain: "+2.0", q: "0.7" },
+                        { id: 2, type: "Peak / Bell", freq: "250", gain: "+3.0", q: "0.8" },
+                        { id: 3, type: "High Shelf", freq: "6000", gain: "-1.5", q: "0.7" },
+                    ]
+                },
+                world: {
+                    title: "World Music",
+                    subtitle: "Organic Acoustic Textures",
+                    desc: "Emphasizes the organic textures of non-Western instrumentation. It highlights the hollow resonance of hand drums (like tablas or djembes) and the sharp pluck of stringed instruments like the sitar or oud.",
+                    preamp: "-2.0",
+                    bands: [
+                        { id: 1, type: "Peak / Bell", freq: "120", gain: "+1.5", q: "1.0" },
+                        { id: 2, type: "Peak / Bell", freq: "800", gain: "+1.0", q: "1.5" },
+                        { id: 3, type: "Peak / Bell", freq: "5000", gain: "+1.5", q: "1.5" },
+                    ]
+                },
+                spoken: {
+                    title: "Spoken Word / Podcasts",
+                    subtitle: "Clear Dialogue",
+                    desc: "Removes distracting room boominess and microphone rumble. It pushes the human voice to the absolute forefront while reducing sharp, fatiguing 'S' sounds (sibilance).",
+                    preamp: "0.0",
+                    bands: [
+                        { id: 1, type: "Low Shelf", freq: "100", gain: "-3.0", q: "0.7" },
+                        { id: 2, type: "Peak / Bell", freq: "1000", gain: "+2.0", q: "1.0" },
+                        { id: 3, type: "Peak / Bell", freq: "6000", gain: "-2.0", q: "2.0" },
+                    ]
+                }
+            };
 
-                <div className="bg-blue-50 border border-blue-100 p-6 mb-8 rounded-sm text-center">
-                    <p className="text-sapphire text-sm leading-relaxed">
-                        <strong className="block font-display text-lg mb-2">What You Will Need</strong>
-                        A MicroSD card (SanDisk or Samsung are excellent choices; 128GB or 256GB is recommended) alongside an "SD Card Reader" to connect the card to your personal computer.
-                    </p>
-                </div>
+            const [selectedProfile, setSelectedProfile] = useState('jazz');
+            const currentData = profiles[selectedProfile];
 
-                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-stone-200">
-                    {[
-                        { step: 1, title: "The Connection", desc: "Place your MicroSD card into your card reader, and plug this reader into your computer (PC or Mac)." },
-                        { step: 2, title: "The Transfer", desc: "Open the memory card folder on your screen. Create a new folder named 'Music'. Drag and drop your cherished albums into this space. Organization is key: Music > Artist > Album." },
-                        { step: 3, title: "The Insertion", desc: "Safely eject the card from your computer. Retrieve it, and gently push it into the slot at the base of your HiBy R1 until you feel a satisfying click." },
-                        { step: 4, title: "The Awakening", desc: "Power on the R1. Navigate to the main menu and select 'Update Database' or 'Scan Music'. The player will read the card, cataloging your library with care." }
-                    ].map((item) => (
-                        <div key={item.step} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-paper border border-stone-300 text-sapphire font-display text-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
-                                {item.step}
-                            </div>
-                            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-6 border border-stone-200 rounded-sm shadow-sm">
-                                <h4 className="font-display font-bold text-ink mb-2 text-lg">{item.title}</h4>
-                                <p className="text-sm text-stone-600 leading-relaxed">{item.desc}</p>
+            return (
+                <div className="space-y-12 animate-fade-in font-serif max-w-4xl mx-auto">
+                    <ChapterTitle title="The Art of Tuning" subtitle="Chapter VI: Advanced PEQ Explained Simply" />
+
+                    {/* Explanation Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="bg-white p-8 border border-stone-200 rounded-sm shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-sapphire"></div>
+                            <h3 className="font-display font-bold text-2xl mb-4 text-ink">Decoding the Numbers</h3>
+                            <p className="text-stone-600 leading-relaxed mb-6">
+                                Standard EQ is like a sledgehammer—turning up the "Bass" turns up <em>everything</em> low. <strong>Parametric EQ (PEQ)</strong> is a scalpel. It lets you isolate the exact snap of a snare drum or the specific rumble of a bass guitar without muddying the rest of the song. Let's break down what the numbers mean:
+                            </p>
+                            <ul className="space-y-5 text-stone-800">
+                                <li className="flex items-start bg-stone-50 p-4 rounded border border-stone-100">
+                                    <span className="text-2xl mr-4 mt-0.5 opacity-80">〰️</span> 
+                                    <div>
+                                        <strong className="block text-ink font-display mb-1 text-lg">Frequency (Hz): The Pitch</strong>
+                                        <span className="text-sm text-stone-600 leading-relaxed">Imagine a massive piano. This number is you pointing to one specific key. Low numbers (like 60Hz) are deep, rumbling bass keys. High numbers (like 8000Hz) are the high, shimmering keys of cymbals.</span>
+                                    </div>
+                                </li>
+                                <li className="flex items-start bg-stone-50 p-4 rounded border border-stone-100">
+                                    <span className="text-2xl mr-4 mt-0.5 opacity-80">🔊</span> 
+                                    <div>
+                                        <strong className="block text-ink font-display mb-1 text-lg">Gain (dB): The Intensity</strong>
+                                        <span className="text-sm text-stone-600 leading-relaxed">Once you pick a piano key, how hard do you strike it? A positive number (+2.0) hits it harder, making it louder. A negative number (-2.0) plays it softer, hiding it in the background.</span>
+                                    </div>
+                                </li>
+                                <li className="flex items-start bg-stone-50 p-4 rounded border border-stone-100">
+                                    <span className="text-2xl mr-4 mt-0.5 opacity-80">🎯</span> 
+                                    <div>
+                                        <strong className="block text-ink font-display mb-1 text-lg">Q-Value: The Brush Width</strong>
+                                        <span className="text-sm text-stone-600 leading-relaxed">When you hit that key, do your fingers accidentally hit the keys next to it? A <strong>low Q (like 0.5)</strong> is a wide, fat finger that affects a broad range of nearby notes. A <strong>high Q (like 2.0)</strong> is a pinpoint strike on just that single note.</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="bg-emerald text-paper p-8 rounded-sm shadow-md flex flex-col justify-center">
+                            <h3 className="font-display font-bold text-2xl mb-4 text-white">Crucial: The Preamp Gain</h3>
+                            <p className="text-emerald-50 leading-relaxed mb-6">
+                                Before you enter any of the numbers below, you will see a setting called <strong>Preamp Gain</strong>. What is this?
+                            </p>
+                            <div className="bg-emerald-900 bg-opacity-40 p-5 rounded border border-emerald-700 mb-4">
+                                <p className="text-emerald-50 text-sm leading-relaxed">
+                                    <strong>Think of it as the Painter's Canvas.</strong> <br/><br/>
+                                    If a song is already recorded at maximum volume, and you try to add +3.0dB of bass, the music will hit a digital ceiling and "clip" (causing nasty distortion). 
+                                    <br/><br/>
+                                    To fix this, we use Preamp Gain to shrink the overall volume of the song slightly <em>before</em> applying our EQ. By setting the Preamp to <strong>-3.0dB</strong>, we create 3 decibels of empty "headroom" at the top of our canvas, giving us a safe space to paint in our new bass boost!
+                                </p>
                             </div>
                         </div>
-                    ))}
+                    </div>
+
+                    <div className="w-full h-px bg-stone-300 my-4"></div>
+
+                    {/* Interactive Profiles Section */}
+                    <div>
+                        <div className="text-center mb-8">
+                            <h3 className="font-display font-bold text-3xl text-ink">The Sonic Library</h3>
+                            <p className="text-stone-500 italic mt-2">Select a genre below to reveal its tuning secret.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            
+                            {/* Left Side: Buttons */}
+                            <div className="md:col-span-1 space-y-2">
+                                {Object.keys(profiles).map(key => (
+                                    <button 
+                                        key={key}
+                                        onClick={() => setSelectedProfile(key)}
+                                        className={`w-full text-left px-4 py-3 rounded border transition-all duration-200 ${
+                                            selectedProfile === key 
+                                            ? 'bg-ink text-paper border-ink shadow-md font-bold' 
+                                            : 'bg-white text-stone-600 border-stone-200 hover:border-stone-400'
+                                        }`}
+                                    >
+                                        <span className="font-display text-lg block">{profiles[key].title}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Right Side: The Table & Info */}
+                            <div className="md:col-span-3 bg-parchment p-6 md:p-8 border border-stone-200 rounded-sm shadow-inner transition-all">
+                                <div className="mb-6">
+                                    <h4 className="font-display font-bold text-2xl text-ink mb-1">{currentData.title}</h4>
+                                    <p className="font-bold text-crimson text-sm tracking-wide uppercase mb-4">{currentData.subtitle}</p>
+                                    <p className="text-stone-700 leading-relaxed italic border-l-4 border-stone-300 pl-4">{currentData.desc}</p>
+                                </div>
+
+                                <div className="bg-white p-4 border border-stone-200 rounded-sm mb-6 flex items-center justify-between">
+                                    <div>
+                                        <p className="text-xs uppercase tracking-widest text-stone-500 font-bold mb-1">Step 1: The Canvas</p>
+                                        <p className="font-display text-lg text-ink">Set Preamp Gain to:</p>
+                                    </div>
+                                    <div className="text-2xl font-bold font-mono text-sapphire bg-blue-50 px-4 py-2 rounded border border-blue-100">
+                                        {currentData.preamp} dB
+                                    </div>
+                                </div>
+
+                                <p className="text-xs font-bold text-stone-500 mb-3 tracking-wider uppercase">Step 2: The Bands (Leave all other bands at 0)</p>
+                                
+                                <div className="overflow-x-auto bg-white border border-stone-200 rounded-sm">
+                                    <table className="w-full text-sm text-left font-serif">
+                                        <thead className="text-xs text-stone-500 uppercase tracking-wider border-b border-stone-200 bg-stone-50">
+                                            <tr>
+                                                <th className="px-4 py-3 font-normal">Band</th>
+                                                <th className="px-4 py-3 font-normal">Filter Type</th>
+                                                <th className="px-4 py-3 font-normal text-right">Freq (Hz)</th>
+                                                <th className="px-4 py-3 font-normal text-right">Gain (dB)</th>
+                                                <th className="px-4 py-3 font-normal text-right">Q-Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-ink">
+                                            {currentData.bands.map((band, idx) => (
+                                                <tr key={band.id} className={idx !== currentData.bands.length - 1 ? "border-b border-stone-100" : ""}>
+                                                    <td className="px-4 py-4 font-bold text-stone-500">Band {band.id}</td>
+                                                    <td className="px-4 py-4 italic text-stone-600">{band.type}</td>
+                                                    <td className="px-4 py-4 text-right font-mono text-stone-800">{band.freq}</td>
+                                                    <td className={`px-4 py-4 text-right font-mono font-bold ${band.gain.includes('+') ? 'text-emerald' : 'text-crimson'}`}>
+                                                        {band.gain}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-right font-mono text-stone-600">{band.q}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        };
 
         const StreamingTab = () => (
             <div className="space-y-8 animate-fade-in font-serif max-w-2xl mx-auto">
@@ -330,86 +527,34 @@
             </div>
         );
 
-        const EqTab = () => (
-            <div className="space-y-8 animate-fade-in font-serif max-w-3xl mx-auto">
-                <ChapterTitle title="The Parametric Equalizer" subtitle="Chapter VI: Advanced Acoustics (PEQ)" />
+        const LocalMusicTab = () => (
+            <div className="space-y-8 animate-fade-in font-serif max-w-2xl mx-auto">
+                <ChapterTitle title="Curating Your Archive" subtitle="Chapter III: Local Memory (MicroSD)" />
 
-                <div className="bg-white p-8 border border-stone-200 rounded-sm shadow-sm mb-8 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-sapphire"></div>
-                    <h3 className="font-display font-bold text-xl mb-4 text-ink flex items-center">
-                        <Sliders className="mr-3 text-sapphire" size={24} /> The Grand Piano Analogy
-                    </h3>
-                    <p className="text-stone-600 text-sm leading-relaxed mb-6">
-                        A standard EQ is a blunt instrument—like turning a "Bass" knob. <strong>PEQ (Parametric EQ)</strong>, however, is akin to sitting at a grand piano, allowing you to tune the nuances of individual notes.
+                <div className="bg-blue-50 border border-blue-100 p-6 mb-8 rounded-sm text-center">
+                    <p className="text-sapphire text-sm leading-relaxed">
+                        <strong className="block font-display text-lg mb-2">What You Will Need</strong>
+                        A MicroSD card (SanDisk or Samsung are excellent choices; 128GB or 256GB is recommended) alongside an "SD Card Reader" to connect the card to your personal computer.
                     </p>
-                    <ul className="space-y-4 text-sm text-stone-800">
-                        <li className="flex items-start">
-                            <span className="text-xl mr-3 mt-1">🎹</span> 
-                            <p><strong>Frequency (Hz):</strong> Selecting the exact key. Low numbers (60Hz) represent the deepest bass. High numbers (8000Hz) represent the shimmer of cymbals.</p>
-                        </li>
-                        <li className="flex items-start">
-                            <span className="text-xl mr-3 mt-1">🔊</span> 
-                            <p><strong>Gain (dB):</strong> Striking the key. A positive number strikes it harder (louder); a negative number plays it softer.</p>
-                        </li>
-                        <li className="flex items-start">
-                            <span className="text-xl mr-3 mt-1">🎯</span> 
-                            <p><strong>Q-Value (Width):</strong> The precision of the strike. A low Q (0.5) implies a wide finger, pressing neighboring keys alongside your target. A high Q (2.0) is a pinpoint strike on a single key.</p>
-                        </li>
-                    </ul>
                 </div>
 
-                <div className="bg-parchment p-8 border border-stone-200 rounded-sm shadow-inner mb-8">
-                    <h3 className="font-display font-bold text-2xl text-ink mb-2">A Profile for Jazz</h3>
-                    <p className="font-bold text-crimson text-sm mb-4 tracking-wide uppercase">Tuned for: Truthear x Crinacle Zero RED</p>
-                    <p className="text-stone-700 text-sm leading-relaxed mb-6 italic">
-                        The Zero: RED are exceptionally accurate dual-driver monitors. For Jazz, we simply wish to breathe a touch of wooden resonance into the upright bass and draw out the delicate breath of the saxophone, without altering the earphone's pure nature.
-                    </p>
-                    <p className="text-xs font-bold text-stone-500 mb-4 tracking-wider uppercase border-b border-stone-300 pb-2">Pathway: Settings > Equalizer > Enable PEQ > Tap a Band</p>
-                    
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left font-serif">
-                            <thead className="text-xs text-stone-500 uppercase tracking-wider border-b border-stone-300">
-                                <tr>
-                                    <th className="px-4 py-3 font-normal">Band</th>
-                                    <th className="px-4 py-3 font-normal">Type</th>
-                                    <th className="px-4 py-3 font-normal text-right">Freq (Hz)</th>
-                                    <th className="px-4 py-3 font-normal text-right">Gain (dB)</th>
-                                    <th className="px-4 py-3 font-normal text-right">Q-Value</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-ink">
-                                <tr className="border-b border-stone-200">
-                                    <td className="px-4 py-4">Band 1</td>
-                                    <td className="px-4 py-4 italic text-stone-600">Low Shelf</td>
-                                    <td className="px-4 py-4 text-right">100</td>
-                                    <td className="px-4 py-4 text-right text-emerald font-bold">+1.5</td>
-                                    <td className="px-4 py-4 text-right">0.7</td>
-                                </tr>
-                                <tr className="border-b border-stone-200 bg-white bg-opacity-40">
-                                    <td className="px-4 py-4">Band 2</td>
-                                    <td className="px-4 py-4 italic text-stone-600">Peak / Bell</td>
-                                    <td className="px-4 py-4 text-right">250</td>
-                                    <td className="px-4 py-4 text-right text-emerald font-bold">+1.0</td>
-                                    <td className="px-4 py-4 text-right">1.0</td>
-                                </tr>
-                                <tr className="border-b border-stone-200">
-                                    <td className="px-4 py-4">Band 3</td>
-                                    <td className="px-4 py-4 italic text-stone-600">Peak / Bell</td>
-                                    <td className="px-4 py-4 text-right">3000</td>
-                                    <td className="px-4 py-4 text-right text-crimson font-bold">-1.0</td>
-                                    <td className="px-4 py-4 text-right">2.0</td>
-                                </tr>
-                                <tr>
-                                    <td className="px-4 py-4">Band 4</td>
-                                    <td className="px-4 py-4 italic text-stone-600">Peak / Bell</td>
-                                    <td className="px-4 py-4 text-right">8000</td>
-                                    <td className="px-4 py-4 text-right text-emerald font-bold">+1.5</td>
-                                    <td className="px-4 py-4 text-right">1.5</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <p className="text-xs text-stone-500 mt-4 text-center">Let all other bands remain dormant (Gain at 0).</p>
+                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-stone-200">
+                    {[
+                        { step: 1, title: "The Connection", desc: "Place your MicroSD card into your card reader, and plug this reader into your computer (PC or Mac)." },
+                        { step: 2, title: "The Transfer", desc: "Open the memory card folder on your screen. Create a new folder named 'Music'. Drag and drop your cherished albums into this space. Organization is key: Music > Artist > Album." },
+                        { step: 3, title: "The Insertion", desc: "Safely eject the card from your computer. Retrieve it, and gently push it into the slot at the base of your HiBy R1 until you feel a satisfying click." },
+                        { step: 4, title: "The Awakening", desc: "Power on the R1. Navigate to the main menu and select 'Update Database' or 'Scan Music'. The player will read the card, cataloging your library with care." }
+                    ].map((item) => (
+                        <div key={item.step} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-paper border border-stone-300 text-sapphire font-display text-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
+                                {item.step}
+                            </div>
+                            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-6 border border-stone-200 rounded-sm shadow-sm">
+                                <h4 className="font-display font-bold text-ink mb-2 text-lg">{item.title}</h4>
+                                <p className="text-sm text-stone-600 leading-relaxed">{item.desc}</p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         );
